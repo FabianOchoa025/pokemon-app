@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import PokemonGrid from "./PokemonGrid";
 import PokemonModal from "./PokemonModal";
 import type { Pokemon } from "./types/pokemon";
@@ -10,6 +10,16 @@ interface BasicPokemon {
   name: string;
   url: string;
 }
+
+// Función segura para convertir a Title Case
+const toTitleCase = (text: any) => {
+  if (!text) return "";
+  return text
+    .toString()
+    .split(/[-\s]+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
 
 export default function App() {
   const [allPokemons, setAllPokemons] = useState<BasicPokemon[]>([]);
@@ -71,8 +81,14 @@ export default function App() {
       const detailedPokemons: Pokemon[] = await Promise.all(
         toFetch.map(async (p) => {
           const res = await fetch(p.url);
-          const data: Pokemon = await res.json();
-          return data;
+          const data = await res.json();
+
+          return {
+            id: data.id,
+            name: toTitleCase(data.name),
+            image: data.sprites?.front_default || "",
+            types: data.types?.map((t: any) => toTitleCase(t.type.name)) || [],
+          };
         })
       );
 
@@ -112,7 +128,7 @@ export default function App() {
                   }}
                   className="px-4 py-2 hover:bg-gray-700 cursor-pointer capitalize"
                 >
-                  {s.name.charAt(0).toUpperCase() + s.name.slice(1)}
+                  {toTitleCase(s.name)}
                 </li>
               ))}
             </ul>
@@ -128,7 +144,7 @@ export default function App() {
             <option value="">All Types</option>
             {types.map((t) => (
               <option key={t} value={t} className="capitalize">
-                {t.charAt(0).toUpperCase() + t.slice(1)}
+                {toTitleCase(t)}
               </option>
             ))}
           </select>
@@ -144,7 +160,7 @@ export default function App() {
         itemsPerPage={ITEMS_PER_PAGE}
         totalItems={search ? pokemons.length : TOTAL_POKEMON}
         onPageChange={setCurrentPage}
-        onSelect={(p: Pokemon) => setSelectedPokemon(p)}
+        onSelect={setSelectedPokemon}
       />
 
       {selectedPokemon && (
