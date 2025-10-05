@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import PokemonGrid from "./PokemonGrid";
-import PokemonModal from "./PokemonModal"; // nuevo
+import PokemonModal from "./PokemonModal";
 import type { Pokemon } from "./types/pokemon";
 
 const ITEMS_PER_PAGE = 20;
@@ -19,7 +19,7 @@ export default function App() {
   const [suggestions, setSuggestions] = useState<BasicPokemon[]>([]);
   const [typeFilter, setTypeFilter] = useState("");
   const [types, setTypes] = useState<string[]>([]);
-  const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null); // nuevo
+  const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
 
   useEffect(() => {
     const fetchAllPokemon = async () => {
@@ -58,9 +58,7 @@ export default function App() {
       if (typeFilter) {
         const res = await fetch(`https://pokeapi.co/api/v2/type/${typeFilter}`);
         const data = await res.json();
-        toFetch = data.pokemon
-          .map((p: any) => p.pokemon)
-          .slice(0, ITEMS_PER_PAGE);
+        toFetch = data.pokemon.map((p: any) => p.pokemon).slice(0, ITEMS_PER_PAGE);
       } else if (search.trim() === "") {
         const offset = (currentPage - 1) * ITEMS_PER_PAGE;
         toFetch = allPokemons.slice(offset, offset + ITEMS_PER_PAGE);
@@ -73,7 +71,8 @@ export default function App() {
       const detailedPokemons: Pokemon[] = await Promise.all(
         toFetch.map(async (p) => {
           const res = await fetch(p.url);
-          return res.json();
+          const data: Pokemon = await res.json();
+          return data;
         })
       );
 
@@ -137,7 +136,6 @@ export default function App() {
             ▼
           </div>
         </div>
-
       </div>
 
       <PokemonGrid
@@ -146,7 +144,7 @@ export default function App() {
         itemsPerPage={ITEMS_PER_PAGE}
         totalItems={search ? pokemons.length : TOTAL_POKEMON}
         onPageChange={setCurrentPage}
-        onSelect={setSelectedPokemon}
+        onSelect={(p: Pokemon) => setSelectedPokemon(p)}
       />
 
       {selectedPokemon && (

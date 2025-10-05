@@ -3,8 +3,8 @@ import Pagination from "./Pagination";
 export interface Pokemon {
   id: number;
   name: string;
-  sprites: { front_default: string };
-  types: { type: { name: string } }[];
+  image: string;
+  types: string[];
 }
 
 interface Props {
@@ -15,6 +15,12 @@ interface Props {
   onPageChange: (page: number) => void;
   onSelect: (pokemon: Pokemon) => void;
 }
+
+const toTitleCase = (text: string) =>
+  text
+    .split(/[-\s]+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 
 export default function PokemonGrid({
   pokemons,
@@ -42,7 +48,7 @@ export default function PokemonGrid({
             className="bg-gray-800 rounded-3xl p-6 flex flex-col items-center hover:scale-105 transform transition cursor-pointer shadow-2xl"
           >
             <img
-              src={pokemon.sprites.front_default}
+              src={pokemon.image}
               alt={pokemon.name}
               className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 mb-4 object-contain"
             />
@@ -52,18 +58,18 @@ export default function PokemonGrid({
             </span>
 
             <h3 className="capitalize font-bold text-2xl sm:text-3xl mb-4 text-white text-center">
-              {pokemon.name}
+              {toTitleCase(pokemon.name)}
             </h3>
 
             <div className="flex gap-4 sm:gap-6 mt-2 flex-wrap justify-center">
-              {pokemon.types.map((t) => (
+              {pokemon.types.map((typeName) => (
                 <span
-                  key={t.type.name}
-                  className={`text-[1rem] sm:text-[1.1rem] capitalize px-4 py-2 rounded-full font-semibold ${getTypeColor(
-                    t.type.name
+                  key={typeName}
+                  className={`text-[1rem] sm:text-[1.1rem] px-4 py-2 rounded-full font-semibold ${getTypeColor(
+                    typeName
                   )}`}
                 >
-                  {t.type.name}
+                  {toTitleCase(typeName)}
                 </span>
               ))}
             </div>
