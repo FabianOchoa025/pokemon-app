@@ -11,15 +11,15 @@ interface BasicPokemon {
   url: string;
 }
 
-// Función segura para convertir a Title Case
 const toTitleCase = (text: any) => {
   if (!text) return "";
   return text
     .toString()
     .split(/[-\s]+/)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 };
+
 
 export default function App() {
   const [allPokemons, setAllPokemons] = useState<BasicPokemon[]>([]);
